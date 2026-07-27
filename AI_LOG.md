@@ -152,3 +152,27 @@ with a 400.
 to `build.gradle.kts`. This is a standard requirement for any Kotlin Spring Boot
 app that uses `@RequestBody` with data classes — the original skeleton was missing it.
 This was caught by running the actual tests locally, not by AI review.
+
+## 7. Terraform remote state + EKS cluster (added for AWS testing)
+
+**The enhancement:** To support actual AWS deployment and testing, enhanced the
+Terraform configuration with:
+
+**What was added:**
+- `backend.tf`: S3 backend with DynamoDB state locking
+- `setup-backend.sh`: Automated script to create S3 bucket + DynamoDB table
+- `vpc.tf`: VPC module with public/private subnets across 2 AZs
+- `eks.tf`: Full EKS cluster (was previously just a commented example)
+- Updated `irsa.tf`: Now automatically uses EKS module output for OIDC provider
+
+**The setup:**
+- S3 bucket for state storage (encrypted, versioned, public access blocked)
+- DynamoDB table for state locking (prevents concurrent terraform apply)
+- Full EKS cluster v1.29 with 2 t3.medium nodes (~$133/month cost)
+- IRSA integration that works out-of-the-box once EKS is deployed
+
+**Why this matters:** The original Terraform was "reviewable but not deployable" —
+it showed the pattern but didn't provision an actual cluster. For real AWS testing,
+you need the full stack. This version is production-ready: run `terraform apply`
+and it creates a working EKS cluster with proper state management and security
+(IRSA, private subnets, etc.).

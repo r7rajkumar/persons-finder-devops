@@ -280,6 +280,30 @@ cat .github/workflows/ci.yml | python3 -c "import sys,yaml; yaml.safe_load(sys.s
 
 ---
 
+## 6️⃣ AWS Deployment (Terraform + EKS) — Optional
+
+Full production deployment to AWS with Terraform:
+
+- **VPC** with public + private subnets
+- **EKS cluster** (v1.29, 2× t3.medium nodes)
+- **ECR** repository
+- **Secrets Manager** for OPENAI_API_KEY
+- **IRSA** for pod-level IAM permissions
+- **S3 + DynamoDB** for remote state + locking
+
+**Cost: ~$133/month if left running**
+
+```bash
+cd terraform
+./setup-backend.sh $(aws sts get-caller-identity --query Account --output text) ap-southeast-2
+terraform init
+terraform apply
+```
+
+See [`terraform/README.md`](terraform/README.md) for full instructions.
+
+---
+
 ## 📡 API Reference
 
 | Method | Path | Body / Query | Response |
