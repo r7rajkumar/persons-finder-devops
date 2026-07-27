@@ -352,3 +352,5 @@ See [`terraform/README.md`](terraform/README.md) for full instructions.
 ![Kubernetes deployment - pods running](screenshots/k8s-deployment-running.png)
 
 ![API smoke test - curl commands](screenshots/api-smoke-test.png)
+
+![Github-actions-ci](screenshots/Github-actions-ci.png)
