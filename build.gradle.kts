@@ -19,9 +19,6 @@ repositories {
 // Override vulnerable transitive dependencies pulled in by Spring Boot 2.7.18.
 // Spring Boot's dependency management sets these versions; we override them
 // explicitly here to get the patched versions without upgrading to Spring Boot 3.
-// Override vulnerable transitive dependencies pulled in by Spring Boot 2.7.18.
-// Spring Boot's dependency management sets these versions; we override them
-// explicitly here to get the patched versions without upgrading to Spring Boot 3.
 // Note: jackson-bom cannot be upgraded past 2.15.x with Kotlin 1.6 —
 // jackson-module-kotlin 2.16+ requires Kotlin 1.8+.
 ext["tomcat.version"]        = "9.0.118"  // fixes all Tomcat CVEs

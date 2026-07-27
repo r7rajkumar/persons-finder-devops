@@ -60,7 +60,7 @@ AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
 # Run the setup script
 chmod +x setup-backend.sh
-./setup-backend.sh $AWS_ACCOUNT_ID ap-southeast-2
+./setup-backend.sh $AWS_ACCOUNT_ID us-east-1
 ```
 
 This creates:
@@ -86,16 +86,16 @@ cd terraform
 terraform init
 
 # Plan
-terraform plan -var="aws_region=ap-southeast-2"
+terraform plan -var="aws_region=us-east-1"
 
 # Apply (creates VPC, EKS cluster, ECR, Secrets Manager, IRSA)
 # WARNING: This provisions real AWS resources that cost ~$133/month
-terraform apply -var="aws_region=ap-southeast-2"
+terraform apply -var="aws_region=us-east-1"
 
 # Takes 10-15 minutes for EKS cluster to be ready
 
 # Configure kubectl
-aws eks update-kubeconfig --region ap-southeast-2 --name persons-finder-cluster
+aws eks update-kubeconfig --region us-east-1 --name persons-finder-cluster
 
 # Verify cluster access
 kubectl get nodes
@@ -125,14 +125,14 @@ See `variables.tf` for all configurable values. Key ones:
 
 | Variable | Default | Description |
 |---|---|---|
-| `aws_region` | `ap-southeast-2` | AWS region |
+| `aws_region` | `us-east-1` | AWS region |
 | `app_name` | `persons-finder` | Used to prefix resource names |
 | `eks_oidc_provider_arn` | `""` (empty) | Required for IRSA — get from your EKS cluster |
 
 ## Clean up
 
 ```bash
-terraform destroy -var="aws_region=ap-southeast-2"
+terraform destroy -var="aws_region=us-east-1"
 
 # Manually delete the backend resources (state bucket + lock table) if no longer needed
 aws s3 rb s3://persons-finder-terraform-state-<ACCOUNT_ID> --force

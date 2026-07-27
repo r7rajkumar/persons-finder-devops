@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.persons.finder.domain.services.LocationsServiceImplTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-07-27T10:32:02" hostname="Mac.local" time="0.22">
+<testsuite name="com.persons.finder.domain.services.LocationsServiceImplTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-07-27T11:25:23" hostname="Mac.local" time="0.21">
   <properties/>
-  <testcase name="findAround returns only locations within the radius()" classname="com.persons.finder.domain.services.LocationsServiceImplTest" time="0.16"/>
-  <testcase name="addLocation upserts via save()" classname="com.persons.finder.domain.services.LocationsServiceImplTest" time="0.059"/>
-  <system-out><![CDATA[2026-07-27 22:32:02.348  WARN 61267 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/util/List
+  <testcase name="findAround returns only locations within the radius()" classname="com.persons.finder.domain.services.LocationsServiceImplTest" time="0.145"/>
+  <testcase name="addLocation upserts via save()" classname="com.persons.finder.domain.services.LocationsServiceImplTest" time="0.065"/>
+  <system-out><![CDATA[2026-07-27 23:25:23.357  WARN 87074 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/util/List
 
 java.lang.IllegalArgumentException: Java 21 (65) is not supported by the current version of Byte Buddy which officially supports Java 20 (64) - update Byte Buddy or set net.bytebuddy.experimental as a VM property
 	at net.bytebuddy.utility.OpenedClassReader.of(OpenedClassReader.java:96) ~[byte-buddy-1.12.23.jar:na]
@@ -127,7 +127,7 @@ java.lang.IllegalArgumentException: Java 21 (65) is not supported by the current
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69) ~[gradle-worker.jar:na]
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74) ~[gradle-worker.jar:na]
 
-2026-07-27 22:32:02.355  WARN 61267 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/util/SequencedCollection
+2026-07-27 23:25:23.362  WARN 87074 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/util/SequencedCollection
 
 java.lang.IllegalArgumentException: Java 21 (65) is not supported by the current version of Byte Buddy which officially supports Java 20 (64) - update Byte Buddy or set net.bytebuddy.experimental as a VM property
 	at net.bytebuddy.utility.OpenedClassReader.of(OpenedClassReader.java:96) ~[byte-buddy-1.12.23.jar:na]
@@ -251,7 +251,7 @@ java.lang.IllegalArgumentException: Java 21 (65) is not supported by the current
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69) ~[gradle-worker.jar:na]
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74) ~[gradle-worker.jar:na]
 
-2026-07-27 22:32:02.365  WARN 61267 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/util/Collection
+2026-07-27 23:25:23.367  WARN 87074 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/util/Collection
 
 java.lang.IllegalArgumentException: Java 21 (65) is not supported by the current version of Byte Buddy which officially supports Java 20 (64) - update Byte Buddy or set net.bytebuddy.experimental as a VM property
 	at net.bytebuddy.utility.OpenedClassReader.of(OpenedClassReader.java:96) ~[byte-buddy-1.12.23.jar:na]
@@ -375,7 +375,7 @@ java.lang.IllegalArgumentException: Java 21 (65) is not supported by the current
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69) ~[gradle-worker.jar:na]
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74) ~[gradle-worker.jar:na]
 
-2026-07-27 22:32:02.369  WARN 61267 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/lang/Iterable
+2026-07-27 23:25:23.370  WARN 87074 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/lang/Iterable
 
 java.lang.IllegalArgumentException: Java 21 (65) is not supported by the current version of Byte Buddy which officially supports Java 20 (64) - update Byte Buddy or set net.bytebuddy.experimental as a VM property
 	at net.bytebuddy.utility.OpenedClassReader.of(OpenedClassReader.java:96) ~[byte-buddy-1.12.23.jar:na]
@@ -499,7 +499,7 @@ java.lang.IllegalArgumentException: Java 21 (65) is not supported by the current
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69) ~[gradle-worker.jar:na]
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74) ~[gradle-worker.jar:na]
 
-2026-07-27 22:32:02.426  WARN 61267 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/lang/Object
+2026-07-27 23:25:23.418  WARN 87074 --- [    Test worker] i.m.p.j.t.InliningClassTransformer       : Failed to transform class java/lang/Object
 
 java.lang.IllegalArgumentException: Java 21 (65) is not supported by the current version of Byte Buddy which officially supports Java 20 (64) - update Byte Buddy or set net.bytebuddy.experimental as a VM property
 	at net.bytebuddy.utility.OpenedClassReader.of(OpenedClassReader.java:96) ~[byte-buddy-1.12.23.jar:na]

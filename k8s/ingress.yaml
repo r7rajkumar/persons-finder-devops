@@ -5,14 +5,16 @@ metadata:
   namespace: persons-finder
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # For production: replace persons-finder.local with your actual domain
+    # and provision a real TLS certificate (cert-manager + Let's Encrypt recommended)
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - persons-finder.REPLACE_WITH_YOUR_DOMAIN
+        - persons-finder.local
       secretName: persons-finder-tls
   rules:
-    - host: persons-finder.REPLACE_WITH_YOUR_DOMAIN
+    - host: persons-finder.local
       http:
         paths:
           - path: /

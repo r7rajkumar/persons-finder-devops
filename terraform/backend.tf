@@ -1,35 +1,17 @@
 # Remote state backend: S3 for state storage + DynamoDB for state locking.
 #
-# Create these resources ONCE before running `terraform init`:
+# STEP 1 — Bootstrap the backend infrastructure (one-time only):
 #
-#   aws s3api create-bucket \
-#     --bucket persons-finder-terraform-state-YOUR_ACCOUNT_ID \
-#     --region ap-southeast-2 \
-#     --create-bucket-configuration LocationConstraint=ap-southeast-2
+#   cd terraform
+#   chmod +x setup-backend.sh
+#   ./setup-backend.sh $(aws sts get-caller-identity --query Account --output text) ap-southeast-2
 #
-#   aws s3api put-bucket-versioning \
-#     --bucket persons-finder-terraform-state-YOUR_ACCOUNT_ID \
-#     --versioning-configuration Status=Enabled
+# STEP 2 — Uncomment the backend block below and run `terraform init`
 #
-#   aws s3api put-bucket-encryption \
-#     --bucket persons-finder-terraform-state-YOUR_ACCOUNT_ID \
-#     --server-side-encryption-configuration '{
-#       "Rules": [{
-#         "ApplyServerSideEncryptionByDefault": {
-#           "SSEAlgorithm": "AES256"
-#         },
-#         "BucketKeyEnabled": false
-#       }]
-#     }'
-#
-#   aws dynamodb create-table \
-#     --table-name persons-finder-terraform-lock \
-#     --attribute-definitions AttributeName=LockID,AttributeType=S \
-#     --key-schema AttributeName=LockID,KeyType=HASH \
-#     --billing-mode PAY_PER_REQUEST \
-#     --region ap-southeast-2
-#
-# Then uncomment the backend block below and run `terraform init`.
+# NOTE: The backend block does not support variables or expressions — the
+# bucket name must be a literal string. Get your account ID with:
+#   aws sts get-caller-identity --query Account --output text
+# Then replace YOUR_ACCOUNT_ID below with the actual value before running init.
 
 # terraform {
 #   backend "s3" {
@@ -40,3 +22,15 @@
 #     dynamodb_table = "persons-finder-terraform-lock"
 #   }
 # }
+#
+# Alternative: pass backend config at init time (avoids editing this file):
+#
+#   ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+#   terraform init \
+#     -backend-config="bucket=persons-finder-terraform-state-${ACCOUNT_ID}" \
+#     -backend-config="key=persons-finder/terraform.tfstate" \
+#     -backend-config="region=ap-southeast-2" \
+#     -backend-config="encrypt=true" \
+#     -backend-config="dynamodb_table=persons-finder-terraform-lock"
+#
+# The -backend-config approach is cleaner — no account ID hardcoded in any file.

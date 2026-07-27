@@ -285,7 +285,7 @@ cat .github/workflows/ci.yml | python3 -c "import sys,yaml; yaml.safe_load(sys.s
 Full production deployment to AWS with Terraform:
 
 - **VPC** with public + private subnets
-- **EKS cluster** (v1.29, 2× t3.medium nodes)
+- **EKS cluster** (v1.32, 2× t3.medium nodes)
 - **ECR** repository
 - **Secrets Manager** for OPENAI_API_KEY
 - **IRSA** for pod-level IAM permissions
@@ -295,9 +295,42 @@ Full production deployment to AWS with Terraform:
 
 ```bash
 cd terraform
+
+# Step 1: Bootstrap the remote state backend (one-time only)
+chmod +x setup-backend.sh
 ./setup-backend.sh $(aws sts get-caller-identity --query Account --output text) ap-southeast-2
-terraform init
+
+# Step 2: Initialise Terraform with remote state backend
+# (no account ID hardcoded in any file)
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+terraform init \
+  -backend-config="bucket=persons-finder-terraform-state-${ACCOUNT_ID}" \
+  -backend-config="key=persons-finder/terraform.tfstate" \
+  -backend-config="region=ap-southeast-2" \
+  -backend-config="encrypt=true" \
+  -backend-config="dynamodb_table=persons-finder-terraform-lock"
+
+# Step 3: Plan and apply
+terraform plan
 terraform apply
+
+# Step 4: Configure kubectl
+aws eks update-kubeconfig --region ap-southeast-2 --name persons-finder-cluster
+kubectl get nodes
+
+# Step 5: Deploy the app
+kubectl apply -k ../k8s/
+kubectl create secret generic persons-finder-secrets \
+  --namespace persons-finder \
+  --from-literal=OPENAI_API_KEY="$OPENAI_API_KEY"
+
+# Step 6: Set the secret value (never stored in Terraform state)
+aws secretsmanager put-secret-value \
+  --secret-id persons-finder/openai-api-key \
+  --secret-string "$OPENAI_API_KEY"
+
+# Destroy when done (avoid ongoing charges)
+terraform destroy
 ```
 
 See [`terraform/README.md`](terraform/README.md) for full instructions.
@@ -315,3 +348,7 @@ See [`terraform/README.md`](terraform/README.md) for full instructions.
 | `GET` | `/actuator/health` | — | `{"status":"UP"}` |
 | `GET` | `/actuator/health/readiness` | — | K8s readiness probe target |
 | `GET` | `/actuator/health/liveness` | — | K8s liveness probe target |
+
+![Kubernetes deployment - pods running](screenshots/k8s-deployment-running.png)
+
+![API smoke test - curl commands](screenshots/api-smoke-test.png)

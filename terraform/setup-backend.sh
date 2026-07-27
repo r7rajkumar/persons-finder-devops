@@ -19,12 +19,22 @@ BUCKET_NAME="persons-finder-terraform-state-${ACCOUNT_ID}"
 TABLE_NAME="persons-finder-terraform-lock"
 
 echo "=== Creating S3 bucket for state storage ==="
-aws s3api create-bucket \
-  --bucket "${BUCKET_NAME}" \
-  --region "${REGION}" \
-  --create-bucket-configuration LocationConstraint="${REGION}" || {
-    echo "Bucket might already exist, continuing..."
-  }
+# us-east-1 is the S3 default region — it must NOT have a LocationConstraint.
+# All other regions require --create-bucket-configuration LocationConstraint=<region>.
+if [ "${REGION}" = "us-east-1" ]; then
+  aws s3api create-bucket \
+    --bucket "${BUCKET_NAME}" \
+    --region "${REGION}" || {
+      echo "Bucket might already exist, continuing..."
+    }
+else
+  aws s3api create-bucket \
+    --bucket "${BUCKET_NAME}" \
+    --region "${REGION}" \
+    --create-bucket-configuration LocationConstraint="${REGION}" || {
+      echo "Bucket might already exist, continuing..."
+    }
+fi
 
 echo "=== Enabling versioning on S3 bucket ==="
 aws s3api put-bucket-versioning \

@@ -153,31 +153,7 @@ to `build.gradle.kts`. This is a standard requirement for any Kotlin Spring Boot
 app that uses `@RequestBody` with data classes — the original skeleton was missing it.
 This was caught by running the actual tests locally, not by AI review.
 
-## 8. Trivy CI scan failures — CVE remediation via dependency overrides
-
-**The issue:** Trivy found CVEs across Alpine OS packages and Java dependencies
-(Tomcat, Jackson, Logback, SnakeYAML, H2), causing CI to fail.
-
-**First attempt:** Switched runtime base image from `eclipse-temurin:11-jre-jammy`
-to `eclipse-temurin:11-jre-alpine` — reduced OS-level CVEs significantly.
-
-**Second attempt:** Added `.trivyignore` for inherited Spring CVEs — partially
-worked but Tomcat/Jackson CVEs remained. Not the right approach — ignoring
-real vulnerabilities rather than fixing them.
-
-**Final fix:** Used Spring Boot's official dependency override mechanism
-(`ext["property.version"]`) to upgrade specific vulnerable transitive
-dependencies within Spring Boot 2.7.18, without upgrading Spring Boot itself:
-
-- `tomcat.version = "9.0.109"` — fixes RCE (CVE-2025-24813), DoS, auth bypass
-- `h2.version = "2.2.220"` — fixes CVE-2022-45868 (H2 console auth bypass)
-- `jackson-bom.version = "2.15.0"` — fixes CVE-2025-52999
-- `logback.version = "1.2.13"` — fixes CVE-2023-6378, CVE-2023-6481
-- `snakeyaml.version = "2.0"` — fixes CVE-2022-1471, CVE-2022-25857
-
-All overrides verified: `./gradlew clean build` passes all 9 tests with the
-updated versions. This is the standard Spring Boot approach for patching
-transitive CVEs without a major version upgrade.
+## 7. Terraform remote state + full EKS cluster
 
 **The enhancement:** To support actual AWS deployment and testing, enhanced the
 Terraform configuration with:
@@ -200,3 +176,5 @@ it showed the pattern but didn't provision an actual cluster. For real AWS testi
 you need the full stack. This version is production-ready: run `terraform apply`
 and it creates a working EKS cluster with proper state management and security
 (IRSA, private subnets, etc.).
+
+## 8. Trivy CI scan failures — CVE remediation via dependency overrides
