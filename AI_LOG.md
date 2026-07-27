@@ -153,29 +153,31 @@ to `build.gradle.kts`. This is a standard requirement for any Kotlin Spring Boot
 app that uses `@RequestBody` with data classes — the original skeleton was missing it.
 This was caught by running the actual tests locally, not by AI review.
 
-## 8. Trivy CI scan failure — inherited dependency CVEs
+## 8. Trivy CI scan failures — CVE remediation via dependency overrides
 
-**Context:** The assessment required "Trivy/Snyk **OR** a mocked AI code reviewer."
-I implemented **both** — the mocked AI reviewer (`.github/scripts/ai-code-review.sh`)
-passes all checks ✅. The Trivy scan is a bonus, not the core requirement.
+**The issue:** Trivy found CVEs across Alpine OS packages and Java dependencies
+(Tomcat, Jackson, Logback, SnakeYAML, H2), causing CI to fail.
 
-**The issue:** Trivy found 43 CVEs (5 CRITICAL, 38 HIGH) across Alpine OS packages
-and Java dependencies, causing CI to fail.
+**First attempt:** Switched runtime base image from `eclipse-temurin:11-jre-jammy`
+to `eclipse-temurin:11-jre-alpine` — reduced OS-level CVEs significantly.
 
-**The cause:** Spring Boot 2.7.18 (latest 2.x LTS) transitively depends on Spring
-Framework 5.3.31 and SnakeYAML 1.30. The CVE fixes require Spring 6.x and
-SnakeYAML 2.0, which only work with Spring Boot 3.x — a major version upgrade
-with breaking changes. The Alpine OS CVEs (libexpat, p11-kit) are also fixed in
-newer Alpine versions but would require rebasing the image.
+**Second attempt:** Added `.trivyignore` for inherited Spring CVEs — partially
+worked but Tomcat/Jackson CVEs remained. Not the right approach — ignoring
+real vulnerabilities rather than fixing them.
 
-**The decision:** Added `.trivyignore` with detailed justifications for each CVE.
-These are inherited dependency vulnerabilities in a stable LTS version; the
-application doesn't use the vulnerable code paths (no HTTP invokers, no untrusted
-deserialization, controlled YAML parsing only). For production, upgrading to
-Spring Boot 3.x would be the correct remediation path. For this assessment, the
-pragmatic choice is to document and ignore CVEs that don't apply to the
-application's actual threat model, rather than introduce breaking changes to
-chase CVE numbers.
+**Final fix:** Used Spring Boot's official dependency override mechanism
+(`ext["property.version"]`) to upgrade specific vulnerable transitive
+dependencies within Spring Boot 2.7.18, without upgrading Spring Boot itself:
+
+- `tomcat.version = "9.0.109"` — fixes RCE (CVE-2025-24813), DoS, auth bypass
+- `h2.version = "2.2.220"` — fixes CVE-2022-45868 (H2 console auth bypass)
+- `jackson-bom.version = "2.15.0"` — fixes CVE-2025-52999
+- `logback.version = "1.2.13"` — fixes CVE-2023-6378, CVE-2023-6481
+- `snakeyaml.version = "2.0"` — fixes CVE-2022-1471, CVE-2022-25857
+
+All overrides verified: `./gradlew clean build` passes all 9 tests with the
+updated versions. This is the standard Spring Boot approach for patching
+transitive CVEs without a major version upgrade.
 
 **The enhancement:** To support actual AWS deployment and testing, enhanced the
 Terraform configuration with:

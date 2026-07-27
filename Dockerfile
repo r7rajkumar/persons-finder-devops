@@ -27,17 +27,17 @@ RUN gradle bootJar --no-daemon -x test \
 ##############################
 # Stage 2: minimal runtime image
 ##############################
-# eclipse-temurin:11-jre-alpine has a significantly smaller attack surface
-# than the jammy (Ubuntu) variant — Alpine ships far fewer OS packages,
-# which means fewer CVEs for Trivy to find at the image level.
-FROM eclipse-temurin:11-jre-alpine AS runtime
+# eclipse-temurin:11-jre-jammy — supports both amd64 (CI/production) and
+# arm64 (Apple Silicon dev machines). CVEs are managed via dependency version
+# overrides in build.gradle.kts and documented in .trivyignore.
+FROM eclipse-temurin:11-jre-jammy AS runtime
 
 ARG APP_USER=spring
 ARG APP_UID=10001
 
-# Alpine uses addgroup/adduser instead of groupadd/useradd
-RUN addgroup --gid ${APP_UID} ${APP_USER} \
-    && adduser --uid ${APP_UID} --ingroup ${APP_USER} --shell /sbin/nologin --no-create-home --disabled-password ${APP_USER}
+# Dedicated non-root user — app never runs as root
+RUN groupadd --gid ${APP_UID} ${APP_USER} \
+    && useradd --uid ${APP_UID} --gid ${APP_USER} --shell /usr/sbin/nologin --no-create-home ${APP_USER}
 
 WORKDIR /app
 

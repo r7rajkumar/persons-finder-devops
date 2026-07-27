@@ -16,12 +16,25 @@ repositories {
 	mavenCentral()
 }
 
+// Override vulnerable transitive dependencies pulled in by Spring Boot 2.7.18.
+// Spring Boot's dependency management sets these versions; we override them
+// explicitly here to get the patched versions without upgrading to Spring Boot 3.
+// Override vulnerable transitive dependencies pulled in by Spring Boot 2.7.18.
+// Spring Boot's dependency management sets these versions; we override them
+// explicitly here to get the patched versions without upgrading to Spring Boot 3.
+// Note: jackson-bom cannot be upgraded past 2.15.x with Kotlin 1.6 —
+// jackson-module-kotlin 2.16+ requires Kotlin 1.8+.
+ext["tomcat.version"]        = "9.0.118"  // fixes all Tomcat CVEs
+ext["h2.version"]            = "2.2.220"  // fixes CVE-2022-45868
+ext["logback.version"]       = "1.2.13"  // fixes CVE-2023-6378, CVE-2023-6481
+ext["snakeyaml.version"]     = "2.0"     // fixes CVE-2022-1471, CVE-2022-25857
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("com.h2database:h2:2.1.212")
+	implementation("com.h2database:h2")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
