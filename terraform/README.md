@@ -17,7 +17,7 @@ and reviewable, with proper remote state and locking.
 
 **EKS cluster (included, ready to deploy):**
 - VPC with public + private subnets across 2 AZs
-- EKS cluster v1.29 with managed node group (2 t3.medium instances)
+- EKS cluster v1.32 with managed node group (2 t3.medium instances)
 - IAM role for IRSA (IAM Roles for Service Accounts), scoped to
   `secretsmanager:GetSecretValue` on that one secret ARN only
 
