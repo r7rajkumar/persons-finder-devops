@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: persons-finder
+  namespace: persons-finder
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - persons-finder.REPLACE_WITH_YOUR_DOMAIN
+      secretName: persons-finder-tls
+  rules:
+    - host: persons-finder.REPLACE_WITH_YOUR_DOMAIN
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: persons-finder
+                port:
+                  number: 80

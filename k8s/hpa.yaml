@@ -1,0 +1,46 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: persons-finder
+  namespace: persons-finder
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: persons-finder
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+# Requires the metrics-server add-on in the cluster (enabled by default on
+# `minikube start`; `minikube addons enable metrics-server` if not).
+#
+# Custom metrics (e.g. requests-per-second from an Ingress/Prometheus) would
+# need the Prometheus Adapter installed and a `type: Pods` or `type: External`
+# metric added here — CPU/memory alone often under-scales a request-latency-
+# bound Spring Boot service, so this is the natural next step, not the
+# finished answer.

@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: persons-finder
+  namespace: persons-finder
+  labels:
+    app: persons-finder
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: persons-finder
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: persons-finder
+    spec:
+      # Runs as an arbitrary non-root UID baked into the image; this just
+      # enforces it at the pod level too, and locks the rest of the pod down.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: persons-finder
+          image: ghcr.io/OWNER/persons-finder:REPLACE_WITH_IMAGE_TAG
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: JAVA_OPTS
+              value: "-XX:MaxRAMPercentage=75.0"
+          envFrom:
+            - secretRef:
+                name: persons-finder-secrets
+          # A JVM needs a writable /tmp even with readOnlyRootFilesystem: true.
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 250m
+              memory: 384Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            # JVM + Spring context startup can take a while under load; give it
+            # up to 60s (12 * 5s) before liveness/readiness start being enforced.
+            failureThreshold: 12
+            periodSeconds: 5
+      volumes:
+        - name: tmp
+          emptyDir: {}
