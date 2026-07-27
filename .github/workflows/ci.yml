@@ -74,6 +74,7 @@ jobs:
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           trivyignores: .trivyignore
+          version: v0.72.0
 
       - name: Show all CVEs including suppressed (for audit visibility)
         run: |
