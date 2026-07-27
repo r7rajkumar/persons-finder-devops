@@ -153,7 +153,21 @@ to `build.gradle.kts`. This is a standard requirement for any Kotlin Spring Boot
 app that uses `@RequestBody` with data classes — the original skeleton was missing it.
 This was caught by running the actual tests locally, not by AI review.
 
-## 7. Terraform remote state + EKS cluster (added for AWS testing)
+## 8. Trivy CI scan failure — base image CVEs
+
+**The issue:** CI pipeline failed on Trivy scan with CRITICAL/HIGH CVEs in
+`eclipse-temurin:11-jre-jammy` (Ubuntu Jammy base image). These are OS-level
+package vulnerabilities, not application code issues.
+
+**The cause:** Ubuntu Jammy ships many OS packages — some have known CVEs that
+haven't been patched upstream yet. The `ignore-unfixed: true` flag filters some
+but not all.
+
+**The fix:** Switched runtime base image from `eclipse-temurin:11-jre-jammy`
+to `eclipse-temurin:11-jre-alpine`. Alpine Linux ships a minimal set of packages
+by design — far fewer CVEs at the OS level, smaller image size, same JRE.
+Note: Alpine uses `addgroup`/`adduser` instead of `groupadd`/`useradd` — updated
+the user creation command accordingly.
 
 **The enhancement:** To support actual AWS deployment and testing, enhanced the
 Terraform configuration with:

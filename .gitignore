@@ -22,6 +22,10 @@
 build/libs/*.jar
 !gradle/wrapper/gradle-wrapper.jar
 
+# Gradle build cache and wrapper downloads
+.gradle/
+build/
+
 # virtual machine crash logs
 hs_err_pid*
 replay_pid*

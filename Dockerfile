@@ -10,10 +10,6 @@
 #   docker pull gradle:8.10.2-jdk11 && docker inspect --format='{{index .RepoDigests 0}}' gradle:8.10.2-jdk11
 # then reference `gradle:8.10.2-jdk11@sha256:<resolved-digest>` here and in CI,
 # and let Dependabot/Renovate open a PR whenever the digest should move.
-
-##############################
-# Stage 1: build the jar
-##############################
 FROM gradle:8.10.2-jdk11 AS build
 
 WORKDIR /home/gradle/src
@@ -31,15 +27,17 @@ RUN gradle bootJar --no-daemon -x test \
 ##############################
 # Stage 2: minimal runtime image
 ##############################
-FROM eclipse-temurin:11-jre-jammy AS runtime
+# eclipse-temurin:11-jre-alpine has a significantly smaller attack surface
+# than the jammy (Ubuntu) variant — Alpine ships far fewer OS packages,
+# which means fewer CVEs for Trivy to find at the image level.
+FROM eclipse-temurin:11-jre-alpine AS runtime
 
 ARG APP_USER=spring
 ARG APP_UID=10001
 
-# Dedicated, unprivileged, non-login user/group — the app never runs as root
-# and can't be used to open an interactive shell if the container is compromised.
-RUN groupadd --gid ${APP_UID} ${APP_USER} \
-    && useradd --uid ${APP_UID} --gid ${APP_USER} --shell /usr/sbin/nologin --no-create-home ${APP_USER}
+# Alpine uses addgroup/adduser instead of groupadd/useradd
+RUN addgroup --gid ${APP_UID} ${APP_USER} \
+    && adduser --uid ${APP_UID} --ingroup ${APP_USER} --shell /sbin/nologin --no-create-home --disabled-password ${APP_USER}
 
 WORKDIR /app
 
