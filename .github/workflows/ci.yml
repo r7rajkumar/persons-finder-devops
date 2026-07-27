@@ -67,7 +67,7 @@ jobs:
         run: docker build -t "${IMAGE_NAME}:${{ github.sha }}" .
 
       - name: Scan image with Trivy (table output for debugging)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: "${{ env.IMAGE_NAME }}:${{ github.sha }}"
           format: table
@@ -75,8 +75,17 @@ jobs:
           ignore-unfixed: true
           trivyignores: .trivyignore
 
+      - name: Show all CVEs including suppressed (for audit visibility)
+        run: |
+          trivy image \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --ignorefile .trivyignore \
+            --show-suppressed \
+            "${{ env.IMAGE_NAME }}:${{ github.sha }}" || true
+
       - name: Scan image with Trivy (SARIF for Security tab)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: "${{ env.IMAGE_NAME }}:${{ github.sha }}"
           format: sarif
@@ -85,6 +94,7 @@ jobs:
           exit-code: "1"
           ignore-unfixed: true
           trivyignores: .trivyignore
+          version: v0.72.0
 
       - name: Upload Trivy results to Security tab
         if: always()

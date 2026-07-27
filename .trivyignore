@@ -8,21 +8,33 @@
 # Remediation path for production: migrate to Spring Boot 3.3.x.
 
 # Spring Framework 5.x CVEs — fixed in Spring 6.x only
-CVE-2016-1000027   # HttpInvokerServiceExporter — not used in this app
-CVE-2024-22243     # URL parsing — fixed in 5.3.32+, but Spring Boot 2.7.18 pins 5.3.31
-CVE-2024-22259     # URL parsing — fixed in 5.3.33+
-CVE-2024-22262     # URL parsing — fixed in 5.3.34+
-CVE-2024-38816     # Path traversal RouterFunctions — not used in this app
-CVE-2024-38819     # Path traversal functional web — not used in this app
-CVE-2025-41249     # Annotation detection — fixed in Spring 6.2.11 only
+# HttpInvokerServiceExporter — not used in this app
+CVE-2016-1000027
+# URL parsing — fixed in 5.3.32+, but Spring Boot 2.7.18 pins 5.3.31
+CVE-2024-22243
+# URL parsing — fixed in 5.3.33+
+CVE-2024-22259
+# URL parsing — fixed in 5.3.34+
+CVE-2024-22262
+# Path traversal RouterFunctions — not used in this app
+CVE-2024-38816
+# Path traversal functional web — not used in this app
+CVE-2024-38819
+# Annotation detection — fixed in Spring 6.2.11 only
+CVE-2025-41249
 
 # Spring Boot 2.x CVEs — fixed in Spring Boot 3.x only
-CVE-2025-22235     # EndpointRequest matcher — app doesn't use EndpointRequest.to()
-CVE-2026-40973     # Session hijacking via predictable values — fixed in 3.5.14+
+# EndpointRequest matcher — app doesn't use EndpointRequest.to()
+CVE-2025-22235
+# Session hijacking via predictable values — fixed in 3.5.14+
+CVE-2026-40973
 
 # Jackson CVEs — fixed in 2.18.8+ which requires Kotlin 1.8 (project uses 1.6)
-GHSA-r7wm-3cxj-wff9  # jackson-core async parser bypass
-CVE-2026-54512       # jackson-databind PolymorphicTypeValidator — app uses default typing disabled
-CVE-2026-54513       # jackson-databind security bypass — same as above
-CVE-2025-52999       # jackson-core StackOverflowError — fixed in 2.15.0 but BOM upgrade
-                     # to 2.15.x with Kotlin 1.6 causes jackson-module-kotlin incompatibility
+# jackson-core async parser bypass
+GHSA-r7wm-3cxj-wff9
+# jackson-databind PolymorphicTypeValidator — app uses default typing disabled
+CVE-2026-54512
+# jackson-databind security bypass
+CVE-2026-54513
+# jackson-core StackOverflowError — fixed in 2.15.0 but BOM upgrade breaks Kotlin 1.6
+CVE-2025-52999
